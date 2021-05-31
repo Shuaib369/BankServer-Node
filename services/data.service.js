@@ -26,54 +26,57 @@ const register = (uname, acno, pswd) => {
   return db.User.findOne({acno})
   .then(user=>{
     console.log(user);
-  })
-  let user = accountDetails;
-
-  if (acno in user) {
-    return {
-      statusCode: 422,
-      status: false,
-      message: "User already exsist please login",
-    };
-  } else {
-    user[acno] = {
-      acno,
-      username: uname,
-      password: pswd,
-      balance: 0,
-    };
-    return {
-      statusCode: 200,
-      status: true,
-      message: "Succesfully Registered",
-    };
-  }
-};
-const login = (req, acno, pswd) =>{
-  let user = accountDetails;
-  if (acno in user) {
-    if (pswd == user[acno]["password"]) {
-      req.session.currentUser = user[acno]
-      return {
-        statusCode: 200,
-        status: true,
-        message: "Succesfully log In"
-      }
-    } else {
+    
+    if (user) {
       return {
         statusCode: 422,
         status: false,
-        message: "Invalid Password"
+        message: "User already exsist please login",
+      }
+    } else {
+      const newUser =new db.User({
+        acno,
+        username: uname,
+        password: pswd,
+        balance: 0
+    
+    })
+    newUser.save();
+      return {
+        statusCode: 200,
+        status: true,
+        message: "Succesfully Registered",
       }
     }
-  } else {
-    return {
-      statusCode: 422,
-      status: false,
-      message: "Invalid account number"
-    } 
+  })
+
   }
-}
+  
+
+  
+const login = (req, acno, password) =>{
+  var acno =parseInt(accno);
+  return db.User.findOne({acno,password})
+  .then(user=>{
+    if (user) {
+     
+        req.session.currentUser = user;
+        return {
+          statusCode: 200,
+          status: true,
+          message: "Succesfully log In"
+        }
+      } 
+      else {
+        return {
+          statusCode: 422,
+          status: false,
+          message: "Invalid Credentials"
+        } 
+      }
+    })
+  }
+
 const deposit = (accno, pswd, amt) => {
 
   var amount = parseInt(amt);

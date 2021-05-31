@@ -1,7 +1,8 @@
 const mongooose =require("mongoose")
 
 mongooose.connect('mongodb://localhost:27017/bankApp',{
-    useNewUrlParser:true
+    useNewUrlParser:true,
+    useUnifiedTopology: true
 })
 
 const User=mongooose.model('user',{

@@ -36,9 +36,6 @@ const authMiddleware=(req,res,next)=>{
 }
 
 
-
-
-
 // GET   Read
 app.get('/', (req, res) => {
   res.status(401).send("This is a get method");
@@ -52,7 +49,7 @@ app.post('/', (req, res) => {
 // POST  Create REGISTER
 app.post('/register', (req,res)=>{
   // console.log(req.body);    commented because its given in global middleware
-  const result=dataService.register(req.body.uname,req.body.acno,req.body.pswd)
+  dataService.register(req.body.uname,req.body.acno,req.body.pswd)
  .then(result=>{
   res.status(result.statusCode).json(result)
  })
@@ -63,9 +60,10 @@ app.post('/login', (req,res)=>{
 
 // console.log(req.body);    //commented because its given in global middleware
 
-  const result=dataService.login(req.body.acno,req.body.pswd);
+  dataService.login(req,req.body.acno,req.body.pswd)
+  .then(result=>{
   res.status(result.statusCode).json(result)
-
+})
 });
 
 // POST  Create  DEPOSIT
