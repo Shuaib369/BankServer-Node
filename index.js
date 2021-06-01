@@ -27,7 +27,7 @@ const authMiddleware=(req,res,next)=>{
     return res.json({
       statusCode: 401,
       status: false,
-      message: "Please Log In ",
+      message: "Please Log In "
     })
   }
   else{
@@ -68,12 +68,14 @@ app.post('/login', (req,res)=>{
 
 // POST  Create  DEPOSIT
 app.post('/deposit',authMiddleware, (req,res)=>{
+  console.log(req.session.currentUser)
 
 // console.log(req.body);    commented because its given in global middleware
 
-  const result=dataService.deposit(req.body.acno,req.body.pswd,req.body.amount);
+  dataService.deposit(req.body.acno,req.body.pswd,req.body.amount)
+  .then(result=>{
   res.status(result.statusCode).json(result)
-
+  })
 });
 
 // POST  Create  WITHDRAWAL
@@ -81,8 +83,10 @@ app.post('/withdrwal',authMiddleware,(req,res)=>{
 
  // console.log(req.body);    commented because its given in global middleware
 
-  const result=dataService.withdrwal(req.body.acno,req.body.pswd,req.body.amount);
+  dataService.withdrwal(req.body.acno,req.body.pswd,req.body.amount)
+  .then(result=>{
   res.status(result.statusCode).json(result)
+  })
 });
 
 // PUT   Update/Modify whole

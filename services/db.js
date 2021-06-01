@@ -9,7 +9,7 @@ const User=mongooose.model('user',{
     acno:Number,
     username:String,
     password:String,
-    balance:String
+    balance:Number
 })
 module.exports={
     User

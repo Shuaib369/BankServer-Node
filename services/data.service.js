@@ -55,7 +55,7 @@ const register = (uname, acno, pswd) => {
 
   
 const login = (req, acno, password) =>{
-  var acno =parseInt(accno);
+  var acno =parseInt(acno);
   return db.User.findOne({acno,password})
   .then(user=>{
     if (user) {
@@ -77,74 +77,62 @@ const login = (req, acno, password) =>{
     })
   }
 
-const deposit = (accno, pswd, amt) => {
+const deposit = (acno, password, amt) => {
 
-  var amount = parseInt(amt);
-  let user = accountDetails;
-  if (accno in user) {
-    if (pswd == user[accno]["password"]) {
-      user[accno]["balance"] += amount;
+  var amt = parseInt(amt);
+  return db.User.findOne({acno,password})
+  .then(user=>{
+    if(!user){
+      return {
+        statusCode: 422,
+        status: false,
+        message: "Invalid Credentials"
+      } 
+    }
+ 
+      user.balance+=amt;
+      user.save();
       return {
         statusCode: 200,
         status: true,
-        balance: user[accno]["balance"],
-        message:
-          amount + " credited and new balance is" + user[accno]["balance"],
-      };
-    } else {
-      return {
-        statusCode: 422,
-        status: false,
-        message: "incorrect password",
-      };
-    }
-  } else {
-    return {
-      statusCode: 422,
-      status: false,
-      message: "Invalid account ",
-    };
+        balance: user.balance,
+        message:amt +" credited and new balance is "+ user.balance
+      }
+    })
   }
-};
+   
 
-const withdrwal = (accno, pswd, amt)=>{
+const withdrwal = (acno, password, amt)=>{
 
-  var amount = parseInt(amt);
-  let user = accountDetails;
-  if (accno in user) {
-    if (pswd == user[accno]["password"]) {
-      if (user[accno]["balance"] > amount) {
-        user[accno]["balance"] -= amount;
-
-        return {
-          statusCode: 200,
-          status: true,
-          balance: user[accno]["balance"],
-          message:
-            amount + " withdrawed  and new balance is" + user[accno]["balance"],
-        };
-      } else {
+  var amt = parseInt(amt);
+  return db.User.findOne({acno,password})
+  .then(user=>{
+    if(!user){
         return {
           statusCode: 422,
-          status: false,
-          message: "insufficient balance ",
-        };
-      }
-    } else {
-      return {
-        statusCode: 422,
-        status: false,
-        message: "incorrect password ",
-      };
+          status: false,       
+          message: "Invalid Credentials"
+      } 
     }
-  } else {
-    return {
-      statusCode: 422,
-      status: false,
-      message: "invalid account ",
-    };
+    if(user.balance<amt){
+      return {
+                  statusCode: 422,
+                  status: false,
+                  message: "insufficient balance "
+                };
+    }
+      user.balance-=amt;
+      user.save();
+      return {
+        statusCode: 200,
+        status: true,
+        balance: user.balance,
+        message:
+          amt +" withdrawed and new balance is "+ user.balance
+      }
+    })
   }
-};
+
 
 module.exports = {
   register,
