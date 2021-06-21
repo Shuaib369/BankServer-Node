@@ -1,7 +1,13 @@
 const express = require('express');     //import statement
 const session= require('express-session');
+const cors = require('cors');
 const dataService =require('./services/data.service');
 const app = express();
+
+app.use(cors({
+  origin:'http://localhost:4200',
+  credentials:true
+}))
 
 app.use(session({
   secret:'randomsecurestring',
@@ -72,7 +78,7 @@ app.post('/deposit',authMiddleware, (req,res)=>{
 
 // console.log(req.body);    commented because its given in global middleware
 
-  dataService.deposit(req.body.acno,req.body.pswd,req.body.amount)
+  dataService.deposit(req.body.acno,req.body.pswd,req.body.amt)
   .then(result=>{
   res.status(result.statusCode).json(result)
   })
@@ -83,7 +89,7 @@ app.post('/withdrwal',authMiddleware,(req,res)=>{
 
  // console.log(req.body);    commented because its given in global middleware
 
-  dataService.withdrwal(req.body.acno,req.body.pswd,req.body.amount)
+  dataService.withdrwal(req,req.body.acno,req.body.pswd,req.body.amount)
   .then(result=>{
   res.status(result.statusCode).json(result)
   })
@@ -103,6 +109,19 @@ app.patch('/', (req, res) => {
 app.delete('/', (req, res) => {
   res.send("This is a delete method");
 });
+
+
+
+// DELETE  ACCOUNT
+app.delete('/deleteAccDetails/:acno',authMiddleware, (req, res) => {
+  dataService.deleteAccDetails(res.params.acno)
+  .then(result=>{
+    res.status(result.statusCode).json(result)
+  })
+}) ;
+
+
+
 
 app.listen(3000, () => {                     // setting which port to display output
   console.log("Server Started at port:3000");    

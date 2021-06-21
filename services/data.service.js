@@ -64,7 +64,8 @@ const login = (req, acno, password) =>{
         return {
           statusCode: 200,
           status: true,
-          message: "Succesfully log In"
+          message: "Succesfully log In",
+          name:user.username
         }
       } 
       else {
@@ -102,7 +103,7 @@ const deposit = (acno, password, amt) => {
   }
    
 
-const withdrwal = (acno, password, amt)=>{
+ const withdrwal = (acno, password, amt)=>{
 
   var amt = parseInt(amt);
   return db.User.findOne({acno,password})
@@ -113,6 +114,13 @@ const withdrwal = (acno, password, amt)=>{
           status: false,       
           message: "Invalid Credentials"
       } 
+    }
+    if(req.session.currentUser!=acno){
+      return {
+        statusCode: 422,
+        status: false,
+        message: "Permission Denied "
+      };
     }
     if(user.balance<amt){
       return {
@@ -133,10 +141,34 @@ const withdrwal = (acno, password, amt)=>{
     })
   }
 
+  const deleteAccDetails=(acno)=>{
+    return db.User.deleteOne({
+      acno:acno
+    }).then(user=>{
+      if(!user){
+        return{
+          status: false,
+          statusCode: 422,
+          message: "Operation Failed "
 
-module.exports = {
+        }
+      }
+      return{
+
+        status: true,
+        statusCode: 200,
+        message: "Account Number"+ acno+"Deleted Succesfully ",
+
+      }
+    })
+  }
+
+
+ module.exports = {
   register,
   login,
   deposit,
   withdrwal,
-};
+  deleteAccDetails
+ };
+
